@@ -15,6 +15,12 @@ name: OpenWrt Builder
 on:
   repository_dispatch:
   workflow_dispatch:
+      inputs:
+        ssh:
+          description: '是否使用SSH连接到Actions'
+          required: false
+          type: boolean
+          default: false
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -69,6 +75,13 @@ jobs:
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
+
+    - name: SSH 连接
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: github.event.inputs.ssh == 'true'
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
     - name: Load custom configuration
       run: |
